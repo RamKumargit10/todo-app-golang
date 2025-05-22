@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-go-app # Service name matches the deployment name
+spec:
+  selector:
+    app: my-go-app # The service will target pods with this label
+  ports:
+    - protocol: TCP
+      port: 80 # The port exposed by the service inside the cluster
+      targetPort: 2000 # The port your container listens on, inside the pod
+      # nodePort: 30080 # The static port on the node (host machine) that will map to port 80 of the service. You can access the app using http://<NodeIP>:30080
+  # type: NodePort # Expose the service on a static port on each node
+  type: ClusterIP
+  # type: LoadBalancer  # Expose the service externally

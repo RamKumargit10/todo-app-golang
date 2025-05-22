@@ -1,0 +1,11 @@
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: block-all-ingress
+spec:
+  podSelector:
+    matchLabels:
+      app: my-go-app
+  ingress: []        # Empty list blocks all ingress traffic
+  policyTypes:
+  - Ingress

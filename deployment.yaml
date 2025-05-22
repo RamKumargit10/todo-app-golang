@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-go-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-go-app # This label must match the pod template labels
+  template:
+    metadata:
+      labels:
+        app: my-go-app #pod label
+    spec:
+      containers:
+        - name: my-go-app
+          image: ramkumar100/my-go-app:latest
+          env:
+            - name: APP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: my-go-app-config # Reference to the ConfigMap
+                  key: APP_PORT # Key in the ConfigMap
+            - name: USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: my-go-app-secret # Reference to the Secret
+                  key: username # Key in the Secret
+            - name: PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: my-go-app-secret # Reference to the Secret
+                  key: password # Key in the Secret     
+          ports:
+           - containerPort: 2000 # The port that the application inside the container listens on
+          resources:
+             requests:
+               cpu: "200m"
+             limits:
+               cpu: "500m"
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /data # Path inside the container where the volume will be mounted
+        - name: log-watcher
+          image: busybox
+          command: ["/bin/sh", "-c", "tail -f /data/output.txt"]
+          volumeMounts:
+            - name: shared-logs
+              mountPath: /data
+      volumes:
+        - name: shared-logs
+          persistentVolumeClaim:
+            claimName: my-go-app-pvc # Reference to the PersistentVolumeClaim
