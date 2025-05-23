@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: my-go-app
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: my-go-app # This label must match the pod template labels
@@ -35,15 +35,20 @@ spec:
            - containerPort: 2000 # The port that the application inside the container listens on
           resources:
              requests:
-               cpu: "200m"
+               cpu: "100m"
              limits:
-               cpu: "500m"
+               cpu: "200m"
           volumeMounts:
             - name: shared-logs
               mountPath: /data # Path inside the container where the volume will be mounted
         - name: log-watcher
           image: busybox
           command: ["/bin/sh", "-c", "tail -f /data/output.txt"]
+          resources:
+             requests:
+               cpu: "100m"
+             limits:
+               cpu: "200m"
           volumeMounts:
             - name: shared-logs
               mountPath: /data
